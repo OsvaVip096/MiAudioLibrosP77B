@@ -1,6 +1,7 @@
 package com.osvaldovillalobosperez.miaudiolibrosp77b;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -19,6 +20,14 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.content_main);
+
+        if ((findViewById(R.id.contenedor_pequeno) != null) &&
+                (getSupportFragmentManager().findFragmentById(
+                        R.id.contenedor_pequeno) == null)) {
+            SelectorFragment primerFragment = new SelectorFragment();
+            getSupportFragmentManager().beginTransaction()
+                    .add(R.id.contenedor_pequeno, primerFragment).commit();
+        }
         /*recyclerView = findViewById(R.id.recycler_view);
         layoutManager = new GridLayoutManager(this,2);
         recyclerView.setLayoutManager(layoutManager);
@@ -34,5 +43,23 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         recyclerView.setAdapter(adp);*/
+    }
+
+    public void mostrarDetalle(int id) {
+        DetalleFragment detalleFragment = (DetalleFragment)
+                getSupportFragmentManager().findFragmentById(R.id.detalle_fragment);
+        if (detalleFragment != null) {
+            detalleFragment.ponInfoLibro(id);
+        } else {
+            DetalleFragment nuevoFragment = new DetalleFragment();
+            Bundle args = new Bundle();
+            args.putInt(DetalleFragment.ARG_ID_LIBRO, id);
+            nuevoFragment.setArguments(args);
+            FragmentTransaction transaccion = getSupportFragmentManager()
+                    .beginTransaction();
+            transaccion.replace(R.id.contenedor_pequeno, nuevoFragment);
+            transaccion.addToBackStack(null);
+            transaccion.commit();
+        }
     }
 }

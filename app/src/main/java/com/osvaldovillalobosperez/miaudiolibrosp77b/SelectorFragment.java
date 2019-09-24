@@ -12,6 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -48,7 +49,7 @@ public class SelectorFragment extends Fragment {
         adaptadorLibros.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(actividad, "Seleccionando elemento: " +
+                /*Toast.makeText(actividad, "Seleccionando elemento: " +
                         recyclerView.getChildAdapterPosition(view), Toast.LENGTH_SHORT).show();
 
                 String t = ((TextView) view.findViewById(R.id.titulo)).getText().toString();
@@ -56,7 +57,10 @@ public class SelectorFragment extends Fragment {
                 String t2 = vectorLibros.elementAt(recyclerView.getChildAdapterPosition(view)).titulo;
 
                 Toast.makeText(actividad, "Seleccionado el elemento: " + t + ", " + t2,
-                        Toast.LENGTH_SHORT).show();
+                        Toast.LENGTH_SHORT).show();*/
+
+                ((MainActivity) actividad).mostrarDetalle(
+                        recyclerView.getChildAdapterPosition(view));
             }
         });
         return v;
