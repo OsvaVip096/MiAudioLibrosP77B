@@ -87,14 +87,6 @@ public class MainActivity extends AppCompatActivity {
         } else if (id == R.id.menu_ultimo) {
             irUltimoVisitado();
             return true;
-        } else if (id == R.id.menu_buscar) {
-            return true;
-        } else if (id == R.id.menu_acerca) {
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setMessage("Mensaje de Acerca De");
-            builder.setPositiveButton(android.R.string.ok, null);
-            builder.create().show();
-            return true;
         }
         return super.onOptionsItemSelected(item);
     }
