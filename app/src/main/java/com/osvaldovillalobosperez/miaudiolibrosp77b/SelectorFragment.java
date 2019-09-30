@@ -22,6 +22,8 @@ import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.snackbar.Snackbar;
+
 import java.util.Vector;
 
 public class SelectorFragment extends Fragment {
@@ -87,12 +89,26 @@ public class SelectorFragment extends Fragment {
                                 startActivity(Intent.createChooser(i, "Compartir"));
                                 break;
                             case 1: //Borrar
-                                vectorLibros.remove(id);
-                                adaptadorLibros.notifyDataSetChanged();
+                                Snackbar.make(v, "¿Estás seguro?", Snackbar.LENGTH_LONG)
+                                        .setAction("SI", new View.OnClickListener() {
+                                            @Override
+                                            public void onClick(View view) {
+                                                vectorLibros.remove(id);
+                                                adaptadorLibros.notifyDataSetChanged();
+                                            }
+                                        })
+                                        .show();
                                 break;
                             case 2: //Insertar
                                 vectorLibros.add(vectorLibros.elementAt(id));
                                 adaptadorLibros.notifyDataSetChanged();
+                                Snackbar.make(v, "Libro insertado", Snackbar.LENGTH_INDEFINITE)
+                                        .setAction("OK", new View.OnClickListener() {
+                                            @Override
+                                            public void onClick(View view) {
+                                            }
+                                        })
+                                        .show();
                                 break;
                         }
                     }
