@@ -7,7 +7,10 @@
 
     <android.support.design.widget.CoordinatorLayout>
 
-        <android.support.design.widget.AppBarLayout>
+        <android.support.design.widget.AppBarLayout
+            android:id="@+id/appBarLayout"
+            android:layout_width="match_parent"
+            android:layout_height="170dp">
 
             <android.support.design.widget.CollapsingToolbarLayout
                 android:id="@+id/collapsing"
@@ -24,7 +27,13 @@
             </android.support.design.widget.CollapsingToolbarLayout>
         </android.support.design.widget.AppBarLayout>
 
-        <android.support.design.widget.FloatingActionButton />
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@android:drawable/ic_dialog_email"
+            app:layout_anchor="@id/appBarLayout"
+            app:layout_anchorGravity="bottom|right|end" />
 
         <include layout="@layout/content_main" />
     </android.support.design.widget.CoordinatorLayout>
