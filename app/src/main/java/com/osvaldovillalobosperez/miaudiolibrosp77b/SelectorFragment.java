@@ -30,7 +30,7 @@ public class SelectorFragment extends Fragment {
 
     RecyclerView recyclerView;
     RecyclerView.LayoutManager layoutManager;
-    AdaptadorLibros adaptadorLibros;
+    AdaptadorLibrosFiltro adaptadorLibros;
     Vector<Libro> vectorLibros;
     AppCompatActivity actividad;
 
@@ -40,7 +40,7 @@ public class SelectorFragment extends Fragment {
         if (context instanceof AppCompatActivity) {
             this.actividad = (AppCompatActivity) context;
             vectorLibros = Libro.ejemploLibros();
-            adaptadorLibros = new AdaptadorLibros(this.actividad, vectorLibros);
+            adaptadorLibros = new AdaptadorLibrosFiltro(this.actividad, vectorLibros);
         }
     }
 
@@ -67,8 +67,11 @@ public class SelectorFragment extends Fragment {
                 Toast.makeText(actividad, "Seleccionado el elemento: " + t + ", " + t2,
                         Toast.LENGTH_SHORT).show();*/
 
+                /*((MainActivity) actividad).mostrarDetalle(
+                        recyclerView.getChildAdapterPosition(view));*/
                 ((MainActivity) actividad).mostrarDetalle(
-                        recyclerView.getChildAdapterPosition(view));
+                        (int) adaptadorLibros.getItemId(
+                                recyclerView.getChildAdapterPosition(view)));
             }
         });
 
@@ -93,14 +96,17 @@ public class SelectorFragment extends Fragment {
                                         .setAction("SI", new View.OnClickListener() {
                                             @Override
                                             public void onClick(View view) {
-                                                vectorLibros.remove(id);
+                                                //vectorLibros.remove(id);
+                                                adaptadorLibros.borrar(id);
                                                 adaptadorLibros.notifyDataSetChanged();
                                             }
                                         })
                                         .show();
                                 break;
                             case 2: //Insertar
-                                vectorLibros.add(vectorLibros.elementAt(id));
+                                //vectorLibros.add(vectorLibros.elementAt(id));
+                                int posicion = recyclerView.getChildLayoutPosition(v);
+                                adaptadorLibros.insertar((Libro) adaptadorLibros.getItem(posicion));
                                 adaptadorLibros.notifyDataSetChanged();
                                 Snackbar.make(v, "Libro insertado", Snackbar.LENGTH_INDEFINITE)
                                         .setAction("OK", new View.OnClickListener() {
