@@ -1,5 +1,6 @@
 package com.osvaldovillalobosperez.miaudiolibrosp77b;
 
+import android.content.SharedPreferences;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
@@ -15,6 +16,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.preference.PreferenceManager;
 
 import java.io.IOException;
 
@@ -79,7 +81,10 @@ public class DetalleFragment extends Fragment implements View.OnTouchListener,
     @Override
     public void onPrepared(MediaPlayer mediaPlayer) {
         Log.d("AudioLibros", "Entramos en onPrepared de MediaPlayer");
-        mediaPlayer.start();
+        SharedPreferences preferencias = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        if (preferencias.getBoolean("pref_autoreproducir", true)) {
+            mediaPlayer.start();
+        }
         mediaController.setMediaPlayer(this);
         mediaController.setAnchorView(getView().findViewById(R.id.fragment_detalle));
         mediaController.setPadding(0, 0, 0, 110);

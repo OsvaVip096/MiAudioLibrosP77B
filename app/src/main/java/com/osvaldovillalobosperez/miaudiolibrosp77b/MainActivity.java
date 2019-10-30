@@ -74,13 +74,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         });
 
 
-        if ((findViewById(R.id.contenedor_pequeno) != null) &&
-                (getSupportFragmentManager().findFragmentById(
-                        R.id.contenedor_pequeno) == null)) {
-            SelectorFragment primerFragment = new SelectorFragment();
-            getSupportFragmentManager().beginTransaction()
-                    .add(R.id.contenedor_pequeno, primerFragment).commit();
-        }
+        int idContenedor = (findViewById(R.id.contenedor_pequeno) != null) ? R.id.contenedor_pequeno : R.id.contenedor_izquierdo;
+        SelectorFragment primerFragment = new SelectorFragment();
+        getSupportFragmentManager().beginTransaction().add(idContenedor, primerFragment).commit();
+
         /*recyclerView = findViewById(R.id.recycler_view);
         layoutManager = new GridLayoutManager(this,2);
         recyclerView.setLayoutManager(layoutManager);
@@ -181,8 +178,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == R.id.menu_preferencias) {
-            Intent i = new Intent(this, PreferenciasActivity.class);
-            startActivity(i);
+            abrePreferencias();
             return true;
         } else if (id == R.id.menu_ultimo) {
             irUltimoVisitado();
@@ -252,4 +248,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
+    public void abrePreferencias() {
+        int idContenedor = (findViewById(R.id.contenedor_pequeno) != null) ? R.id.contenedor_pequeno : R.id.contenedor_izquierdo;
+        PreferenciasFragment prefFragment = new PreferenciasFragment();
+        getSupportFragmentManager().beginTransaction().replace(idContenedor, prefFragment).addToBackStack(null).commit();
+    }
 }
