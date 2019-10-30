@@ -32,6 +32,9 @@
         <activity android:name=".Libro">
 
         </activity>
+        <activity android:name=".PreferenciasActivity">
+
+        </activity>
     </application>
 
 </manifest>

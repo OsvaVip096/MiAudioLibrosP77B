@@ -12,6 +12,7 @@ import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.TestLooperManager;
@@ -180,7 +181,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == R.id.menu_preferencias) {
-            Toast.makeText(this, "Preferencias", Toast.LENGTH_LONG).show();
+            Intent i = new Intent(this, PreferenciasActivity.class);
+            startActivity(i);
             return true;
         } else if (id == R.id.menu_ultimo) {
             irUltimoVisitado();
