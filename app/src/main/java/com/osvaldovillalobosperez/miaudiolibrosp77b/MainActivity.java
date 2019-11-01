@@ -142,7 +142,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             public void onTabReselected(TabLayout.Tab tab) {
             }
         });
-        //adaptador = ((Aplicacion) getApplicationContext()).getAdaptador();
+        adaptador = ((Aplicacion) getApplicationContext()).getAdaptador();
     }
 
     public void mostrarDetalle(int id) {
