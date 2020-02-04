@@ -3,6 +3,8 @@
     package="com.osvaldovillalobosperez.miaudiolibrosp77b">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+
     <application
         android:name=".Aplicacion"
         android:allowBackup="true"
@@ -36,6 +38,8 @@
         <activity android:name=".PreferenciasActivity">
 
         </activity>
+
+        <service android:name=".ServicioLibros" />
     </application>
 
 </manifest>

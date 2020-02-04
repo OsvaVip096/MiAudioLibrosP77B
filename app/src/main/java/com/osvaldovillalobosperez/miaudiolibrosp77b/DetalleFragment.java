@@ -1,9 +1,14 @@
 package com.osvaldovillalobosperez.miaudiolibrosp77b;
 
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -15,6 +20,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.preference.PreferenceManager;
 
@@ -26,6 +32,7 @@ public class DetalleFragment extends Fragment implements View.OnTouchListener,
     public static String ARG_ID_LIBRO = "id_libro";
     MediaPlayer mediaPlayer;
     MediaController mediaController;
+    String guardar = "";
 
     /**
      * @param id    ID del Libro a utilizar.
@@ -44,6 +51,7 @@ public class DetalleFragment extends Fragment implements View.OnTouchListener,
         mediaPlayer.setOnPreparedListener(this); // Identifica quien es el escuchador.
         mediaController = new MediaController(getActivity()); // Establece una nueva instancia.
         Uri audio = Uri.parse(libro.urlAudio); // Uri que maneja la localización de archivos.
+        guardar = libro.urlAudio;
         try {
             mediaPlayer.setDataSource(getActivity(), audio); // Establece la fuente del audio.
             mediaPlayer.prepareAsync(); //Prepara el archivo de la fuente.
@@ -73,6 +81,10 @@ public class DetalleFragment extends Fragment implements View.OnTouchListener,
         return vista;
     }
 
+
+    ServicioLibros servicioLibros;
+    boolean mBound = false;
+
     /**
      * Inicia la reproducción del medio.
      *
@@ -83,20 +95,52 @@ public class DetalleFragment extends Fragment implements View.OnTouchListener,
         Log.d("AudioLibros", "Entramos en onPrepared de MediaPlayer");
         SharedPreferences preferencias = PreferenceManager.getDefaultSharedPreferences(getActivity());
         if (preferencias.getBoolean("pref_autoreproducir", true)) {
-            mediaPlayer.start();
+                Intent serviceIntent = new Intent(getActivity().getApplicationContext(), ServicioLibros.class);
+                serviceIntent.putExtra("inputExtra", guardar);
+                ContextCompat.startForegroundService(getActivity(), serviceIntent);
+                //bindService();
         }
-        mediaController.setMediaPlayer(this);
+
+        /*mediaController.setMediaPlayer(this);
         mediaController.setAnchorView(getView().findViewById(R.id.fragment_detalle));
         mediaController.setPadding(0, 0, 0, 110);
         mediaController.setEnabled(true);
-        mediaController.show();
+        mediaController.show();*/
     }
+
+    private ServiceConnection serviceConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            ServicioLibros.MiBinder miBinder = (ServicioLibros.MiBinder) service;
+            servicioLibros = miBinder.getService();
+            mBound = true;
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            mBound = false;
+        }
+    };
+
+
+    void bindService() {
+        getActivity().bindService(new Intent(getActivity(), ServicioLibros.class), serviceConnection, Context.BIND_AUTO_CREATE);
+    }
+
+    void unBindService() {
+        if (mBound == true) {
+            getActivity().unbindService(serviceConnection);
+            mBound = false;
+        }
+    }
+
 
     @Override
     public boolean onTouch(View view, MotionEvent motionEvent) {
         mediaController.show();
         return false;
     }
+
 
     @Override
     public void onStop() {
@@ -117,6 +161,7 @@ public class DetalleFragment extends Fragment implements View.OnTouchListener,
 
     @Override
     public void pause() {
+        servicioLibros.StopAudio();
         mediaPlayer.pause();
     }
 
