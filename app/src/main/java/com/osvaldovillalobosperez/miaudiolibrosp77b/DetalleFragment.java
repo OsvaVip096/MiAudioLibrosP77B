@@ -95,10 +95,10 @@ public class DetalleFragment extends Fragment implements View.OnTouchListener,
         Log.d("AudioLibros", "Entramos en onPrepared de MediaPlayer");
         SharedPreferences preferencias = PreferenceManager.getDefaultSharedPreferences(getActivity());
         if (preferencias.getBoolean("pref_autoreproducir", true)) {
-                Intent serviceIntent = new Intent(getActivity().getApplicationContext(), ServicioLibros.class);
-                serviceIntent.putExtra("inputExtra", guardar);
-                ContextCompat.startForegroundService(getActivity(), serviceIntent);
-                //bindService();
+            Intent serviceIntent = new Intent(getActivity().getApplicationContext(), ServicioLibros.class);
+            serviceIntent.putExtra("inputExtra", guardar);
+            ContextCompat.startForegroundService(getActivity(), serviceIntent);
+            //bindService();
         }
 
         /*mediaController.setMediaPlayer(this);

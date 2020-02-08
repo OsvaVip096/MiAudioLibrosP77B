@@ -6,7 +6,6 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
-import android.content.res.Configuration;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Binder;
@@ -15,12 +14,9 @@ import android.os.IBinder;
 import android.util.Log;
 
 import androidx.annotation.Nullable;
-import androidx.core.app.NotificationBuilderWithBuilderAccessor;
 import androidx.core.app.NotificationCompat;
 
-import java.io.FileDescriptor;
 import java.io.IOException;
-import java.io.PrintWriter;
 
 public class ServicioLibros extends Service {
     public static final String CHANNEL_ID = "ForegroundServiceChannel";
@@ -44,6 +40,7 @@ public class ServicioLibros extends Service {
     }
 
     Uri obtenerDireccion;
+
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         String input = intent.getStringExtra("inputExtra");
@@ -61,7 +58,7 @@ public class ServicioLibros extends Service {
         Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
                 .setContentTitle("Mi Audio Libros P77B")
                 .setContentText("Este es un servicio en primer plano")
-                .setSmallIcon(R.drawable.preview)
+                .setSmallIcon(R.drawable.libro_peq)
                 .setContentIntent(pendingIntent)
                 .build();
 
@@ -73,7 +70,7 @@ public class ServicioLibros extends Service {
             e.printStackTrace();
         }
 
-        return Service.START_STICKY;
+        return START_STICKY;
     }
 
     @Override
@@ -91,7 +88,8 @@ public class ServicioLibros extends Service {
 
     private final IBinder binder = new MiBinder();
 
-    public ServicioLibros() {}
+    public ServicioLibros() {
+    }
 
     public class MiBinder extends Binder {
         public ServicioLibros getService() {
@@ -102,8 +100,6 @@ public class ServicioLibros extends Service {
     public IBinder getBinder() {
         return binder;
     }
-
-
 
 
     private static String TAG = "ForegroundService";
