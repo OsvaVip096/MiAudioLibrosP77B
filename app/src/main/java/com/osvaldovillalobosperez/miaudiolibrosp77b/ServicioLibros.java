@@ -40,37 +40,73 @@ public class ServicioLibros extends Service {
     }
 
     Uri obtenerDireccion;
+    boolean libroEnCurso = false;
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        String input = intent.getStringExtra("inputExtra");
-        obtenerDireccion = Uri.parse(input);
-        createNotificationChannel();
-        Intent notificationIntent = new Intent(ServicioLibros.this, MainActivity.class);
+        if (libroEnCurso == false) {
+            libroEnCurso = true;
+            String input = intent.getStringExtra("inputExtra");
+            String bookName = intent.getStringExtra("bookName");
+            obtenerDireccion = Uri.parse(input);
+            createNotificationChannel();
+            Intent notificationIntent = new Intent(ServicioLibros.this, MainActivity.class);
 
-        PendingIntent pendingIntent = PendingIntent.getActivity(
-                ServicioLibros.this,
-                0,
-                notificationIntent,
-                0
-        );
+            PendingIntent pendingIntent = PendingIntent.getActivity(
+                    ServicioLibros.this,
+                    0,
+                    notificationIntent,
+                    0
+            );
 
-        Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
-                .setContentTitle("Mi Audio Libros P77B")
-                .setContentText("Este es un servicio en primer plano")
-                .setSmallIcon(R.drawable.libro_peq)
-                .setContentIntent(pendingIntent)
-                .build();
+            Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
+                    .setContentTitle("MiAudioLibrosP77B")
+                    .setContentText("Libro en reproducción: " + bookName)
+                    .setSmallIcon(R.drawable.libro_peq)
+                    .setContentIntent(pendingIntent)
+                    .build();
 
-        startForeground(1, notification);
+            startForeground(1, notification);
 
-        try {
-            StartAudio();
-        } catch (IOException e) {
-            e.printStackTrace();
+            try {
+                StartAudio();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            return START_STICKY;
+        } else {
+            StopAudio();
+            String input = intent.getStringExtra("inputExtra");
+            String bookName = intent.getStringExtra("bookName");
+            obtenerDireccion = Uri.parse(input);
+            createNotificationChannel();
+            Intent notificationIntent = new Intent(ServicioLibros.this, MainActivity.class);
+
+            PendingIntent pendingIntent = PendingIntent.getActivity(
+                    ServicioLibros.this,
+                    0,
+                    notificationIntent,
+                    0
+            );
+
+            Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
+                    .setContentTitle("Mi Audio Libros P77B")
+                    .setContentText("Libro en reproducción: " + bookName)
+                    .setSmallIcon(R.drawable.libro_peq)
+                    .setContentIntent(pendingIntent)
+                    .build();
+
+            startForeground(1, notification);
+
+            try {
+                StartAudio();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            return START_STICKY;
         }
-
-        return START_STICKY;
     }
 
     @Override
@@ -130,4 +166,9 @@ public class ServicioLibros extends Service {
         mediaPlayer.stop();
         mediaPlayer.release();
     }
+
+    /*public void onTaskRemoved(Intent rootIntent) {
+        super.onTaskRemoved(rootIntent);
+        this.stopSelf();
+    }*/
 }

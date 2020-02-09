@@ -33,6 +33,7 @@ public class DetalleFragment extends Fragment implements View.OnTouchListener,
     MediaPlayer mediaPlayer;
     MediaController mediaController;
     String guardar = "";
+    String guartarBookLibroName = "";
 
     /**
      * @param id    ID del Libro a utilizar.
@@ -41,6 +42,7 @@ public class DetalleFragment extends Fragment implements View.OnTouchListener,
     private void ponInfoLibro(int id, View vista) {
         Libro libro = Libro.ejemploLibros().elementAt(id);
         ((TextView) vista.findViewById(R.id.titulo)).setText(libro.titulo);
+        guartarBookLibroName = libro.titulo;
         ((TextView) vista.findViewById(R.id.autor)).setText(libro.autor);
         ((ImageView) vista.findViewById(R.id.portada)).setImageResource(libro.recursoImagen);
         vista.setOnTouchListener(this);
@@ -97,6 +99,7 @@ public class DetalleFragment extends Fragment implements View.OnTouchListener,
         if (preferencias.getBoolean("pref_autoreproducir", true)) {
             Intent serviceIntent = new Intent(getActivity().getApplicationContext(), ServicioLibros.class);
             serviceIntent.putExtra("inputExtra", guardar);
+            serviceIntent.putExtra("bookName", guartarBookLibroName);
             ContextCompat.startForegroundService(getActivity(), serviceIntent);
             //bindService();
         }
