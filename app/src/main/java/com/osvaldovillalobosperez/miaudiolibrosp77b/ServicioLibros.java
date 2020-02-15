@@ -18,7 +18,7 @@ import androidx.core.app.NotificationCompat;
 
 import java.io.IOException;
 
-public class ServicioLibros extends Service {
+public class ServicioLibros extends Service implements MediaPlayer.OnPreparedListener {
     public static final String CHANNEL_ID = "ForegroundServiceChannel";
 
     @Override
@@ -127,6 +127,12 @@ public class ServicioLibros extends Service {
     public ServicioLibros() {
     }
 
+    @Override
+    public void onPrepared(MediaPlayer mp) {
+        //mediaPlayer.start();
+        mp.start();
+    }
+
     public class MiBinder extends Binder {
         public ServicioLibros getService() {
             return ServicioLibros.this;
@@ -140,29 +146,22 @@ public class ServicioLibros extends Service {
 
     private static String TAG = "ForegroundService";
     MediaPlayer mediaPlayer;
-    private boolean currentlySendingtAudio = false;
 
     public void StartAudio() throws IOException {
         Log.d("MENSAJEIMPORTANTE", "Comenzó a reproducirce audio");
-        currentlySendingtAudio = true;
 
         mediaPlayer = new MediaPlayer();
-        mediaPlayer.setDataSource(getApplicationContext(), obtenerDireccion);
-        mediaPlayer.prepare();
-        mediaPlayer.setLooping(false);
-        mediaPlayer.start();
-
-        mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-            @Override
-            public void onCompletion(MediaPlayer mp) {
-
-            }
-        });
+        mediaPlayer.setOnPreparedListener(this);
+        try {
+            mediaPlayer.setDataSource(getApplicationContext(), obtenerDireccion); // Establece la fuente del audio.
+            mediaPlayer.prepareAsync(); //Prepara el archivo de la fuente.
+        } catch (IOException e) {
+            Log.e("Audiolibros", "ERROR: No se puede reproducir el audio.");
+        }
     }
 
     public void StopAudio() {
         Log.d("MENSAJEIMPORTANTE", "Se detuvo la reproducción de audio");
-        currentlySendingtAudio = false;
         mediaPlayer.stop();
         mediaPlayer.release();
     }

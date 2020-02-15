@@ -27,13 +27,10 @@ import androidx.preference.PreferenceManager;
 import java.io.IOException;
 
 public class DetalleFragment extends Fragment implements View.OnTouchListener,
-        MediaPlayer.OnPreparedListener, MediaController.MediaPlayerControl {
+        MediaController.MediaPlayerControl {
 
     public static String ARG_ID_LIBRO = "id_libro";
-    MediaPlayer mediaPlayer;
     MediaController mediaController;
-    String guardar = "";
-    String guartarBookLibroName = "";
 
     /**
      * @param id    ID del Libro a utilizar.
@@ -42,35 +39,38 @@ public class DetalleFragment extends Fragment implements View.OnTouchListener,
     private void ponInfoLibro(int id, View vista) {
         Libro libro = Libro.ejemploLibros().elementAt(id);
         ((TextView) vista.findViewById(R.id.titulo)).setText(libro.titulo);
-        guartarBookLibroName = libro.titulo;
+        String guartarBookLibroName = libro.titulo;
         ((TextView) vista.findViewById(R.id.autor)).setText(libro.autor);
         ((ImageView) vista.findViewById(R.id.portada)).setImageResource(libro.recursoImagen);
         vista.setOnTouchListener(this);
-        if (mediaPlayer != null) {
-            mediaPlayer.release();
-        }
-        mediaPlayer = new MediaPlayer();
-        mediaPlayer.setOnPreparedListener(this); // Identifica quien es el escuchador.
         mediaController = new MediaController(getActivity()); // Establece una nueva instancia.
+
         Uri audio = Uri.parse(libro.urlAudio); // Uri que maneja la localización de archivos.
-        guardar = libro.urlAudio;
-        try {
-            mediaPlayer.setDataSource(getActivity(), audio); // Establece la fuente del audio.
-            mediaPlayer.prepareAsync(); //Prepara el archivo de la fuente.
-        } catch (IOException e) {
-            Log.e("Audiolibros", "ERROR: No se puede reproducir " + audio, e);
+        String enviarUri = String.valueOf(audio);
+
+        SharedPreferences preferencias = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        if (preferencias.getBoolean("pref_autoreproducir", true)) {
+            Intent serviceIntent = new Intent(getActivity().getApplicationContext(), ServicioLibros.class);
+            serviceIntent.putExtra("inputExtra", enviarUri);
+            serviceIntent.putExtra("bookName", guartarBookLibroName);
+            ContextCompat.startForegroundService(getActivity(), serviceIntent);
         }
     }
 
     public void ponInfoLibro(int id) {
         ponInfoLibro(id, getView());
+
+        mediaController.setMediaPlayer(this);
+        mediaController.setAnchorView(getView().findViewById(R.id.fragment_detalle));
+        mediaController.setPadding(0, 0, 0, 110);
+        mediaController.setEnabled(true);
+        mediaController.show();
     }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        //return super.onCreateView(inflater, container, savedInstanceState);
         View vista = inflater.inflate(R.layout.fragment_detalle,
                 container, false);
         Bundle args = getArguments();
@@ -85,58 +85,6 @@ public class DetalleFragment extends Fragment implements View.OnTouchListener,
 
 
     ServicioLibros servicioLibros;
-    boolean mBound = false;
-
-    /**
-     * Inicia la reproducción del medio.
-     *
-     * @param mediaPlayer
-     */
-    @Override
-    public void onPrepared(MediaPlayer mediaPlayer) {
-        Log.d("AudioLibros", "Entramos en onPrepared de MediaPlayer");
-        SharedPreferences preferencias = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        if (preferencias.getBoolean("pref_autoreproducir", true)) {
-            Intent serviceIntent = new Intent(getActivity().getApplicationContext(), ServicioLibros.class);
-            serviceIntent.putExtra("inputExtra", guardar);
-            serviceIntent.putExtra("bookName", guartarBookLibroName);
-            ContextCompat.startForegroundService(getActivity(), serviceIntent);
-            //bindService();
-        }
-
-        /*mediaController.setMediaPlayer(this);
-        mediaController.setAnchorView(getView().findViewById(R.id.fragment_detalle));
-        mediaController.setPadding(0, 0, 0, 110);
-        mediaController.setEnabled(true);
-        mediaController.show();*/
-    }
-
-    private ServiceConnection serviceConnection = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName name, IBinder service) {
-            ServicioLibros.MiBinder miBinder = (ServicioLibros.MiBinder) service;
-            servicioLibros = miBinder.getService();
-            mBound = true;
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName name) {
-            mBound = false;
-        }
-    };
-
-
-    void bindService() {
-        getActivity().bindService(new Intent(getActivity(), ServicioLibros.class), serviceConnection, Context.BIND_AUTO_CREATE);
-    }
-
-    void unBindService() {
-        if (mBound == true) {
-            getActivity().unbindService(serviceConnection);
-            mBound = false;
-        }
-    }
-
 
     @Override
     public boolean onTouch(View view, MotionEvent motionEvent) {
@@ -149,8 +97,10 @@ public class DetalleFragment extends Fragment implements View.OnTouchListener,
     public void onStop() {
         mediaController.hide();
         try {
-            mediaPlayer.stop();
-            mediaPlayer.release();
+            /*mediaPlayer.stop();
+            mediaPlayer.release();*/
+            servicioLibros.mediaPlayer.stop();
+            servicioLibros.mediaPlayer.release();
         } catch (Exception e) {
             Log.d("AudioLibros", "Error en MediaPlayer.stop()");
         }
@@ -159,24 +109,27 @@ public class DetalleFragment extends Fragment implements View.OnTouchListener,
 
     @Override
     public void start() {
-        mediaPlayer.start();
+        //mediaPlayer.start();
+        servicioLibros.mediaPlayer.start();
     }
 
     @Override
     public void pause() {
-        servicioLibros.StopAudio();
-        mediaPlayer.pause();
+        //mediaPlayer.pause();
+        servicioLibros.mediaPlayer.pause();
     }
 
     @Override
     public int getDuration() {
-        return mediaPlayer.getDuration();
+        //return mediaPlayer.getDuration();
+        return servicioLibros.mediaPlayer.getDuration();
     }
 
     @Override
     public int getCurrentPosition() {
         try {
-            return mediaPlayer.getCurrentPosition();
+            //return mediaPlayer.getCurrentPosition();
+            return servicioLibros.mediaPlayer.getCurrentPosition();
         } catch (Exception e) {
             return 0;
         }
@@ -184,12 +137,14 @@ public class DetalleFragment extends Fragment implements View.OnTouchListener,
 
     @Override
     public void seekTo(int i) {
-        mediaPlayer.seekTo(i);
+        //mediaPlayer.seekTo(i);
+        servicioLibros.mediaPlayer.seekTo(i);
     }
 
     @Override
     public boolean isPlaying() {
-        return mediaPlayer.isPlaying();
+        //return mediaPlayer.isPlaying();
+        return servicioLibros.mediaPlayer.isPlaying();
     }
 
     @Override
